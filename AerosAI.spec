@@ -5,7 +5,7 @@ a = Analysis(
     ['C:\\Users\\Regine Torremoro\\Desktop\\Earl John\\Python\\ai_chatbot\\main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('C:\\Users\\Regine Torremoro\\Desktop\\Earl John\\Python\\ai_chatbot\\.env.local', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

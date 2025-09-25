@@ -1,4 +1,5 @@
 -q -U google-genai
 termcolor
 python-dotenv
+colorama
 pyinstaller

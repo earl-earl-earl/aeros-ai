@@ -2,11 +2,15 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 from termcolor import colored, cprint
+from colorama import init as colorama_init
 import re
 import textwrap
 import time
 
 load_dotenv('.env.local')
+
+# Initialize colorama so ANSI colors work correctly on Windows consoles
+colorama_init()
 
 MODEL = "gemini-2.5-flash"
 NAME = "Aeros AI"
@@ -14,11 +18,18 @@ BEHAVIOR = f"You are {NAME}, a helpful, warm, and friendly AI assistant that hel
 
 client = genai.Client()
 
+grounding_tool = types.Tool(
+    google_search=types.GoogleSearch()
+)
+
+config = types.GenerateContentConfig(
+    tools=[grounding_tool],
+    system_instruction=BEHAVIOR,
+)
+
 chat = client.chats.create(
     model=MODEL,
-    config=types.GenerateContentConfig(
-      system_instruction=BEHAVIOR,
-    ),
+    config=config
 )
 
 def show_thinking():
@@ -106,14 +117,12 @@ def format_response(text):
     return '\n'.join(formatted_lines)
 
 def print_ai_response(text):
-    """Print AI response with enhanced formatting and animations"""
-    formatted_text = format_response(text)
-    
-    # Print with AI name styling
+    """Print AI response without additional formatting; colors for labels remain."""
+    # Print with AI name styling (colors left untouched)
     cprint("\nAeros AI:", "green", attrs=["bold"], end=" ")
-    
-    # Print the formatted response
-    print(formatted_text)
+
+    # Print the raw response text (no markdown/code styling applied)
+    print(text)
     print()
 
 def send_message(prompt):
@@ -128,7 +137,12 @@ def main():
   
   while True:
     # Enhanced user prompt
-    user_input = input(colored("> ", "blue", attrs=["bold"]))
+    try:
+        user_input = input(colored("> ", "blue", attrs=["bold"]))
+    except (KeyboardInterrupt, EOFError):
+        print()
+        print_ai_response(send_message("Goodbye!"))
+        break
     
     if not user_input.strip():
       cprint("Please enter a message!", "red")
